@@ -1,5 +1,5 @@
 import streamlit as st
-st.set_page_config(layout="wide")   # ページをワイド表示に設定（デフォルトは狭い）
+st.set_page_config(layout='wide')   # ページをワイド表示に設定（デフォルトは狭い）
 
 import pandas as pd
 import plotly.express as px
@@ -11,15 +11,15 @@ import plotly.express as px
 # header: 項目列を指定
 
 # 高等学校数データ（シート1: 本校＋分校の合計を使用）
-df_hs = pd.read_excel("files/都道府県別_学校数(高).xlsx", header=5)
+df_hs = pd.read_excel('files/都道府県別_学校数(高).xlsx', header=5)
 
 # 大学数データ
-df_uni = pd.read_excel("files/都道府県別_学校数(大)_2025.xlsx", header=5)
+df_uni = pd.read_excel('files/都道府県別_学校数(大)_2025.xlsx', header=5)
 
 # 大学進学率データ（国立・公立・私立高校）
-df_rate1 = pd.read_excel("files/都道府県別_卒業後状況_2025.xlsx", sheet_name=0, header=5)   # 国立高校卒業者（シート1）
-df_rate2 = pd.read_excel("files/都道府県別_卒業後状況_2025.xlsx", sheet_name=1, header=5)   # 公立高校卒業者（シート2）
-df_rate3 = pd.read_excel("files/都道府県別_卒業後状況_2025.xlsx", sheet_name=2, header=5)   # 私立高校卒業者（シート3）
+df_rate1 = pd.read_excel('files/都道府県別_卒業後状況_2025.xlsx', sheet_name=0, header=5)   # 国立高校卒業者（シート1）
+df_rate2 = pd.read_excel('files/都道府県別_卒業後状況_2025.xlsx', sheet_name=1, header=5)   # 公立高校卒業者（シート2）
+df_rate3 = pd.read_excel('files/都道府県別_卒業後状況_2025.xlsx', sheet_name=2, header=5)   # 私立高校卒業者（シート3）
 
 
 
@@ -28,13 +28,11 @@ df_rate3 = pd.read_excel("files/都道府県別_卒業後状況_2025.xlsx", shee
 df_hs = df_hs.rename(columns={'区分.1': '都道府県', '計': '学校数'})
 df_uni = df_uni.rename(columns={'区分.1': '都道府県', '計': '学校数'})
 
-# 3つの大学進学率データを仮リスト df にまとめて、ループ処理を適用させる
+# 3つの大学進学率データ（df_rate1, df_rate2, df_rate3）を仮のリスト df としてまとめ、同じ前処理をループで適用する
 for df in [df_rate1, df_rate2, df_rate3]:
-    df.rename(columns={'区分': '都道府県',
-                       '計': '卒業者数',
-                       'A大学等進学者': '大学進学者数'
-                       }, 
-                       inplace=True)
+    df.rename(columns={'区分': '都道府県','計': '卒業者数','A大学等進学者': '大学進学者数'},    # 変更が df に入った状態
+              inplace=True      # df_rate1, df_rate2, df_rate3 に変更を反映する
+              )
 
 
 
@@ -69,28 +67,28 @@ df_uni_merged = pd.merge(df_uni,            # 大学数
 st.title('🏫 学校数と大学進学率の関係を見てみよう')
 st.divider()        # 未使用UI(1)：区切り線
 
-st.markdown("""
-            ### 📌 アプリについて
+st.subheader('📌 アプリについて')
+st.markdown('''
             このアプリでは、都道府県ごとの**高校や大学の数**と**大学進学率**のデータを使って、「学校の数と進学率は関係あるのか？」を簡単にチェックできます。
             グラフやランキングで、直感的に県ごとの違いを比べてみましょう。
-            """)
+            ''')
 
-st.markdown("""
-            ### 🎯 目的
+st.subheader('🎯 目的')
+st.markdown('''
             - 学校数が多い県は進学率が高いのか調べる
             - データを見ながら傾向をつかむ
             - 「学校数が少ないけど進学率が高い県」など、意外な特徴を発見する
-            """)
+            ''')
 st.divider()
 
 
 
 # ===== 使い方 ====================
-with st.popover("⚒️ 使い方"):       # 未使用UI(2)：開閉可能なコンテナを挿入
-    st.markdown("""
-                **① 学校の種類を選ぶ**  
+with st.popover('⚒️ 使い方'):       # 未使用UI(2)：開閉可能なコンテナを挿入
+    st.markdown('''
+               **① 学校の種類を選ぶ**  
                 - 左側のラジオボタンで「高等学校数」または「大学数」を選択  
-                - データ表やグラフも自動で切り替わります
+                - データ表やグラフも自動で切り替わる
 
                 **② 散布図で関係を確認**  
                 - 横軸：学校数、縦軸：大学進学率    
@@ -102,7 +100,7 @@ with st.popover("⚒️ 使い方"):       # 未使用UI(2)：開閉可能なコ
                 - スライドバーで表示する都道府県数を指定
                 - (学校の種類は①で選択したデータを使用)
                 - 棒の色やラベルで1位やワーストがすぐわかる
-                """)
+                ''')
 
 
 
@@ -120,7 +118,6 @@ with tab1:
         school_type = st.radio('データの選択',
                                ['高等学校数', '大学数'])
         
-        # ⇩書き方変える？
         if school_type == '高等学校数':
             df_school = df_hs_merged        # 高校数と進学率の結合ファイルを、グラフ用データファイルに設定
             st.caption('※ 高等学校数は本校＋分校の合計です')    # 未使用UI(4)：注釈を追記
@@ -158,9 +155,7 @@ with tab2:
     with col2_left:
         st.subheader('条件選択')
         st.write(f'学校数データ: 「{school_type}」を選択中')
-        st.caption(f'学校数データの種類を変更したい方は[学校数と進学率]より選択してください')
-
-        # st.write(f'{school_type}')の表示入れたい
+        st.caption('学校数データの種類を変更したい方は[学校数と進学率]より選択してください')
 
         # 上位か下位か選択（ラジオボタン）
         rank_type = st.radio('ランキングの種類',
@@ -173,7 +168,6 @@ with tab2:
                           value=10)
         
         # データを大学進学率でソートして抽出し、グラフ用データファイルに設定
-        # ⇩書き方かえる？
         if rank_type == '上位':
             df_rank = df_school.sort_values(by='大学進学率',     # df_school を「大学進学率」の順で並び替え
                                             ascending=False     # 大きい順（上位）
@@ -198,6 +192,7 @@ with tab2:
     # 右カラム（結果表示）
     with col2_right:
         st.subheader('🏆大学進学率ランキング')
+        st.write('本ランキングは大学進学率の高い順（または低い順）に都道府県を並べ、その県における学校数を棒の長さで示しています。')
         
         # 1位／ワースト1位を色分け
         df_rank['color'] = '2位以降'
@@ -209,7 +204,7 @@ with tab2:
         fig_bar = px.bar(df_rank,
                          x='都道府県',
                          y='学校数',
-                         text=df_rank['順位'],  # ←
+                         text=df_rank['順位'],  # 各都道府県ごとにラベルとして「順位」列の値を表示
                          color='color',
                          color_discrete_map={'2位以降': 'lightblue', '🏅1位': 'red', '💀ワースト1位': 'blue'},
                          hover_name='都道府県',
@@ -224,20 +219,19 @@ st.divider()
 
 
 # ===== データ情報 ====================
-st.markdown("""
-### 🔍 データについて
-- 高等学校数・大学数データ：e-Stat「学校基本調査」より取得（2026年1月31日）
-- 大学数データ：同上（2026年1月31日）
-- 大学進学率データ：同上（大学進学率は、国立・公立・私立高校の卒業者数・大学進学者数を合計して算出）
-- データの単位：学校数（校）、人数（人）、進学率（％）
-""")
+st.subheader('🔍 データについて')
+st.markdown('''
+            - 高等学校数・大学数データ：e-Stat「学校基本調査」より取得（2026年1月31日）
+            - 大学進学率データ：同上（大学進学率は、国立・公立・私立高校の卒業者数・大学進学者数を合計して算出）
+            - データの単位：学校数（校）、人数（人）、進学率（％）
+            ''')
 st.divider()
 
 
 
 # ===== 可視化結果の考察 ====================
-st.markdown("""
-            ### 💡可視化結果の考察
+st.subheader('💡可視化結果の考察')
+st.markdown(''' 
             散布図やランキングを見てみると、いくつか面白い傾向が見えてきます。
             
             - 全体的には、学校数が多い県ほど大学進学率がやや高め、という傾向がみられます（弱い相関）。
@@ -250,4 +244,4 @@ st.markdown("""
             - 学校数が多いと進学率が高めの傾向はある  
             - でも東京都や北海道のように「学校数と進学率の関係だけでは説明できない県」もある  
             - 進学率には学校数以外の要素も影響している可能性が高い
-            """)
+            ''')
